@@ -1,4 +1,5 @@
 ﻿using findata_api.Data;
+using findata_api.DTOs.Stock;
 using findata_api.Mappers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,5 +25,15 @@ public class StocksController(ApplicationDBContext dbContext) : ControllerBase
         var stock = _dbContext.Stocks.Find(id);
 
         return stock == null ? NotFound() : Ok(stock.ToStockDto());
+    }
+
+    [HttpPost]
+    public IActionResult Create([FromBody] CreateStockRequestDto createStockRequestDto)
+    {
+        var stock = createStockRequestDto.ToStockFromCreateDto();
+        _dbContext.Stocks.Add(stock);
+        _dbContext.SaveChanges();
+
+        return CreatedAtAction(nameof(Get), new { id = stock.Id }, stock.ToStockDto());
     }
 }
