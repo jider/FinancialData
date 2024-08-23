@@ -36,4 +36,26 @@ public class StocksController(ApplicationDBContext dbContext) : ControllerBase
 
         return CreatedAtAction(nameof(Get), new { id = stock.Id }, stock.ToStockDto());
     }
+
+    [HttpPut("{id}")]
+    public IActionResult Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockRequestDto)
+    {
+        var stock = _dbContext.Stocks.FirstOrDefault(stock => stock.Id == id);
+
+        if (stock is null)
+        {
+            return NotFound();
+        }
+
+        stock.CompanyName = updateStockRequestDto.CompanyName;
+        stock.Industry = updateStockRequestDto.Industry;
+        stock.LastDiv = updateStockRequestDto.LastDiv;
+        stock.MarketCap = updateStockRequestDto.MarketCap;
+        stock.Purchase = updateStockRequestDto.Purchase;
+        stock.Symbol = updateStockRequestDto.Symbol;
+
+        _dbContext.SaveChanges();
+
+        return Ok(stock.ToStockDto());
+    }
 }
