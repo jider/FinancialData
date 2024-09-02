@@ -1,4 +1,6 @@
-﻿namespace findata_api.DTOs.Stock;
+﻿using findata_api.DTOs.Comment;
+
+namespace findata_api.DTOs.Stock;
 
 public class StockDto
 {
@@ -14,4 +16,6 @@ public class StockDto
     public string Industry { get; set; } = string.Empty;
 
     public long MarketCap { get; set; }
+
+    public List<CommentDto> Comments { get; set; } = [];
 }

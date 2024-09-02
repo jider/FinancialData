@@ -28,14 +28,24 @@ public class StockRepository(ApplicationDBContext dbContext) : IStockRepository
         return stock;
     }
 
+    public async Task<bool> ExistAsync(int id)
+    {
+        return await dbContext.Stocks.AnyAsync(stock => stock.Id == id);
+    }
+
     public async Task<List<Stock>> GetAllAsync()
     {
-        return await dbContext.Stocks.ToListAsync();
+        return await dbContext.Stocks
+            .AsNoTracking()
+            .Include(stock => stock.Comments)
+            .ToListAsync();
     }
 
     public async Task<Stock?> GetAsync(int id)
     {
-        return await dbContext.Stocks.FindAsync(id);
+        return await dbContext.Stocks
+            .Include(stock => stock.Comments)
+            .FirstOrDefaultAsync(stock => stock.Id == id);
     }
 
     public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto updateStockRequestDto)

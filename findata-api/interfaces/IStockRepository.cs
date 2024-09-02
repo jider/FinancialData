@@ -9,6 +9,8 @@ public interface IStockRepository
 
     Task<Stock?> DeleteAsync(int id);
 
+    Task<bool> ExistAsync(int  id);
+
     Task<List<Stock>> GetAllAsync();
 
     Task<Stock?> GetAsync(int id);

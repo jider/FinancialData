@@ -1,6 +1,5 @@
 ﻿using findata_api.DTOs.Stock;
 using findata_api.Models;
-using System.Runtime.CompilerServices;
 
 namespace findata_api.Mappers;
 
@@ -16,7 +15,8 @@ public static class StockMapper
             Industry = stockModel.Industry,
             LastDiv = stockModel.LastDiv,
             MarketCap = stockModel.MarketCap,
-            Purchase = stockModel.Purchase
+            Purchase = stockModel.Purchase,
+            Comments = stockModel.Comments.Select(comment => comment.ToCommentDto()).ToList()
         };
     }
 
