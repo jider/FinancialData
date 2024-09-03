@@ -3,6 +3,7 @@ using findata_api.DTOs.Stock;
 using findata_api.interfaces;
 using findata_api.Mappers;
 using findata_api.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace findata_api.Controllers;
 
@@ -11,6 +12,7 @@ namespace findata_api.Controllers;
 public class StocksController(IStockRepository stockRepository) : ControllerBase
 {
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll([FromQuery] QueryFilter queryFilter)
     {
         var stocks = await stockRepository.GetAllAsync(queryFilter);
