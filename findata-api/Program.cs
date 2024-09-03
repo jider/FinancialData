@@ -1,6 +1,8 @@
+using findata_api.Common.Models;
 using findata_api.Data;
 using findata_api.interfaces;
 using findata_api.Repository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,10 @@ builder.Services
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
     });
+
+builder.Services.Configure<ApiBehaviorOptions>(options => {
+    options.InvalidModelStateResponseFactory = ErrorResponse.GenerateErrorResponse;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

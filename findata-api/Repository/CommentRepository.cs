@@ -1,4 +1,5 @@
 ﻿using findata_api.Data;
+using findata_api.DTOs.Comment;
 using findata_api.interfaces;
 using findata_api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,5 +37,18 @@ public class CommentRepository(ApplicationDBContext dBContext) : ICommentReposit
     public async Task<Comment?> GetByIdAsync(int id)
     {
         return await dBContext.Comments.FindAsync(id);
+    }
+
+    public async Task<Comment?> UpdateAsync(int id, Comment commentModel)
+    {
+        var comment = await dBContext.Comments.FindAsync(id);
+
+        if (comment is null) return null;
+
+        comment.Title = commentModel.Title;
+        comment.Content = commentModel.Content;
+
+        await dBContext.SaveChangesAsync();
+        return comment;
     }
 }

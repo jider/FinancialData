@@ -18,7 +18,7 @@ public class CommentController(ICommentRepository commentRepository, IStockRepos
         return Ok(commentDtos);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var comment = await commentRepository.GetByIdAsync(id);
@@ -28,7 +28,7 @@ public class CommentController(ICommentRepository commentRepository, IStockRepos
         return Ok(comment.ToCommentDto());
     }
 
-    [HttpPost("{stockId}")]
+    [HttpPost("{stockId:int}")]
     public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentRequestDto createCommentRequestDto)
     {
         if (!await stockRepository.ExistAsync(stockId)) return BadRequest("Stock does not exist");
@@ -38,7 +38,17 @@ public class CommentController(ICommentRepository commentRepository, IStockRepos
         return CreatedAtAction(nameof(GetById), new { id = createdComment.Id }, createdComment.ToCommentDto());
     }
 
-    [HttpDelete("{id}")]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateCommentRequestDto)
+    {
+        var updatedComment = await commentRepository.UpdateAsync(id, updateCommentRequestDto.ToCommentFromUpdateDto());
+
+        return updatedComment == null
+            ? NotFound()
+            : Ok(updatedComment.ToCommentDto());
+    }
+
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var comment = await commentRepository.DeleteAsync(id);

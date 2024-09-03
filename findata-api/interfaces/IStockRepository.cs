@@ -1,4 +1,5 @@
-﻿using findata_api.DTOs.Stock;
+﻿using findata_api.Common.Models;
+using findata_api.DTOs.Stock;
 using findata_api.Models;
 
 namespace findata_api.interfaces;
@@ -11,7 +12,7 @@ public interface IStockRepository
 
     Task<bool> ExistAsync(int  id);
 
-    Task<List<Stock>> GetAllAsync();
+    Task<List<Stock>> GetAllAsync(QueryFilter queryFilter);
 
     Task<Stock?> GetAsync(int id);
 

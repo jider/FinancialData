@@ -2,6 +2,7 @@
 using findata_api.DTOs.Stock;
 using findata_api.interfaces;
 using findata_api.Mappers;
+using findata_api.Common.Models;
 
 namespace findata_api.Controllers;
 
@@ -10,15 +11,15 @@ namespace findata_api.Controllers;
 public class StocksController(IStockRepository stockRepository) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] QueryFilter queryFilter)
     {
-        var stocks = await stockRepository.GetAllAsync();
+        var stocks = await stockRepository.GetAllAsync(queryFilter);
         var stocksDto = stocks.Select(stock => stock.ToStockDto());
 
         return Ok(stocksDto);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> Get([FromRoute] int id)
     {
         var stock = await stockRepository.GetAsync(id);
@@ -37,7 +38,7 @@ public class StocksController(IStockRepository stockRepository) : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = createdStock.Id }, createdStock.ToStockDto());
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockRequestDto)
     {
         var stock = await stockRepository.UpdateAsync(id, updateStockRequestDto);
@@ -47,7 +48,7 @@ public class StocksController(IStockRepository stockRepository) : ControllerBase
             : Ok(stock.ToStockDto());
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var stock = await stockRepository.DeleteAsync(id);

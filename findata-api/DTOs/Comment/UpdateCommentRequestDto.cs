@@ -2,7 +2,7 @@
 
 namespace findata_api.DTOs.Comment;
 
-public class CreateCommentRequestDto
+public class UpdateCommentRequestDto
 {
     [Required]
     [MinLength(5, ErrorMessage = "Title must be at least of 5 characters")]
