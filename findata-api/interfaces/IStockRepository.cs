@@ -16,5 +16,7 @@ public interface IStockRepository
 
     Task<Stock?> GetAsync(int id);
 
+    Task<Stock?> GetBySymbolAsync(string symbol);
+
     Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto updateStockRequestDto);
 }

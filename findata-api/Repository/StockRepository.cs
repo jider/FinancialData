@@ -39,6 +39,7 @@ public class StockRepository(ApplicationDBContext dbContext) : IStockRepository
         var stocks = dbContext.Stocks
             .AsNoTracking()
             .Include(stock => stock.Comments)
+            .ThenInclude(comment => comment.AppUser)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(queryFilter.CompanyName))
@@ -73,7 +74,15 @@ public class StockRepository(ApplicationDBContext dbContext) : IStockRepository
     {
         return await dbContext.Stocks
             .Include(stock => stock.Comments)
+            .ThenInclude(comment => comment.AppUser)
             .FirstOrDefaultAsync(stock => stock.Id == id);
+    }
+
+    public async Task<Stock?> GetBySymbolAsync(string symbol)
+    {
+        return await dbContext.Stocks
+            .Include(stock => stock.Comments)
+            .FirstOrDefaultAsync(stock => stock.Symbol.ToLower() == symbol.ToLower());
     }
 
     public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto updateStockRequestDto)

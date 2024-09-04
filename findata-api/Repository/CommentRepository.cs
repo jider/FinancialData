@@ -1,5 +1,4 @@
 ﻿using findata_api.Data;
-using findata_api.DTOs.Comment;
 using findata_api.interfaces;
 using findata_api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -31,12 +30,17 @@ public class CommentRepository(ApplicationDBContext dBContext) : ICommentReposit
 
     public async Task<List<Comment>> GetAllAsync()
     {
-        return await dBContext.Comments.AsNoTracking().ToListAsync();
+        return await dBContext.Comments
+            .AsNoTracking()
+            .Include(comment => comment.AppUser)
+            .ToListAsync();
     }
 
     public async Task<Comment?> GetByIdAsync(int id)
     {
-        return await dBContext.Comments.FindAsync(id);
+        return await dBContext.Comments
+            .Include(comment => comment.AppUser)
+            .FirstOrDefaultAsync(comment => comment.Id == id);
     }
 
     public async Task<Comment?> UpdateAsync(int id, Comment commentModel)

@@ -1,13 +1,16 @@
 ﻿using findata_api.DTOs.Comment;
+using findata_api.Extensions;
 using findata_api.interfaces;
 using findata_api.Mappers;
+using findata_api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace findata_api.Controllers;
 
 [Route("api/comment")]
 [ApiController]
-public class CommentController(ICommentRepository commentRepository, IStockRepository stockRepository) : ControllerBase
+public class CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -32,8 +35,9 @@ public class CommentController(ICommentRepository commentRepository, IStockRepos
     public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentRequestDto createCommentRequestDto)
     {
         if (!await stockRepository.ExistAsync(stockId)) return BadRequest("Stock does not exist");
-
-        var createdComment = await commentRepository.CreateAsync(createCommentRequestDto.ToCommentFromCreateDto(stockId));
+        
+        var appUser = await userManager.FindByNameAsync(User.GetUserName());
+        var createdComment = await commentRepository.CreateAsync(createCommentRequestDto.ToCommentFromCreateDto(appUser, stockId));
 
         return CreatedAtAction(nameof(GetById), new { id = createdComment.Id }, createdComment.ToCommentDto());
     }

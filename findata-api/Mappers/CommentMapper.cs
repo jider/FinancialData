@@ -11,16 +11,18 @@ public static class CommentMapper
         {
             Id = comment.Id,
             Content = comment.Content,
+            CreatedBy = comment.AppUser.UserName,
             CreatedOn = comment.CreatedOn,
             StockId = comment.StockId,
             Title = comment.Title
         };
     }
 
-    public static Comment ToCommentFromCreateDto(this CreateCommentRequestDto createCommentRequestDto, int stockId)
+    public static Comment ToCommentFromCreateDto(this CreateCommentRequestDto createCommentRequestDto, AppUser appUser, int stockId)
     {
         return new Comment
         {
+            AppUserId = appUser.Id,            
             Content = createCommentRequestDto.Content,
             Title = createCommentRequestDto.Title,
             StockId = stockId
