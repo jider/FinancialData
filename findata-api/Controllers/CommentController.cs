@@ -10,7 +10,11 @@ namespace findata_api.Controllers;
 
 [Route("api/comment")]
 [ApiController]
-public class CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager) : ControllerBase
+public class CommentController(
+    ICommentRepository commentRepository,
+    IFMPService fmpService,
+    IStockRepository stockRepository,
+    UserManager<AppUser> userManager) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -31,13 +35,20 @@ public class CommentController(ICommentRepository commentRepository, IStockRepos
         return Ok(comment.ToCommentDto());
     }
 
-    [HttpPost("{stockId:int}")]
-    public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentRequestDto createCommentRequestDto)
+    [HttpPost("{symbol:alpha}")]
+    public async Task<IActionResult> Create([FromRoute] string symbol, [FromBody] CreateCommentRequestDto createCommentRequestDto)
     {
-        if (!await stockRepository.ExistAsync(stockId)) return BadRequest("Stock does not exist");
-        
+        var stock = await stockRepository.GetBySymbolAsync(symbol);
+        if (stock is null)
+        {
+            stock = await fmpService.FindStockBySymbolAsync(symbol);
+            if (stock is null) return BadRequest("Stock does not exists");
+
+            await stockRepository.CreateAsync(stock);
+        }
+
         var appUser = await userManager.FindByNameAsync(User.GetUserName());
-        var createdComment = await commentRepository.CreateAsync(createCommentRequestDto.ToCommentFromCreateDto(appUser, stockId));
+        var createdComment = await commentRepository.CreateAsync(createCommentRequestDto.ToCommentFromCreateDto(appUser, stock.Id));
 
         return CreatedAtAction(nameof(GetById), new { id = createdComment.Id }, createdComment.ToCommentDto());
     }

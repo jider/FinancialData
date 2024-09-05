@@ -32,4 +32,17 @@ public static class StockMapper
             Symbol = createStockRequestDto.Symbol
         };
     }
+
+    public static Stock ToStockFromFMP(this FMPStock fmpStock)
+    {
+        return new Stock
+        {
+            CompanyName = fmpStock.CompanyName,
+            Industry = fmpStock.Industry,
+            LastDiv = (decimal)fmpStock.LastDiv,
+            MarketCap = fmpStock.MktCap,
+            Purchase = (decimal)fmpStock.Price,
+            Symbol = fmpStock.Symbol
+        };
+    }
 }

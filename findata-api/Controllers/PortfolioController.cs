@@ -1,6 +1,7 @@
 ﻿using findata_api.Extensions;
 using findata_api.interfaces;
 using findata_api.Models;
+using findata_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,11 @@ namespace findata_api.Controllers;
 
 [Route("api/portfolio")]
 [ApiController]
-public class PortfolioController(UserManager<AppUser> userManager, IPortfolioRepository portfolioRepository, IStockRepository stockRepository) : ControllerBase
+public class PortfolioController(    
+    IFMPService fmpService,
+    IPortfolioRepository portfolioRepository,
+    IStockRepository stockRepository,
+    UserManager<AppUser> userManager) : ControllerBase
 {
     [HttpGet]
     [Authorize]
@@ -30,7 +35,13 @@ public class PortfolioController(UserManager<AppUser> userManager, IPortfolioRep
         var appUser = await userManager.FindByNameAsync(username);
 
         var stock = await stockRepository.GetBySymbolAsync(symbol);
-        if (stock is null) return NotFound();
+        if (stock is null)
+        {
+            stock = await fmpService.FindStockBySymbolAsync(symbol);
+            if (stock is null) return BadRequest("Stock does not exists");
+
+            await stockRepository.CreateAsync(stock);
+        }
 
         var userPortfolio = await portfolioRepository.GetUserPortfolioAsync(appUser);
         if (userPortfolio.Any(stock => stock.Symbol.ToLower() == symbol.ToLower())) return BadRequest("The symbol provided already exists in the portfolio");
